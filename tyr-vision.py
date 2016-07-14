@@ -7,7 +7,7 @@ capture.set(15, -4) #set exposure
 capture.set(5, 20) #set max fps
 capture.set(3, 640) #set videostream width
 capture.set(4, 480) #set videostream height
-COLOR_MAX = np.array([180, 255, 255], np.uint8)
+COLOR_MAX = np.array([12, 245, 36], np.uint8)
 
 def draw_HUD(img, x, y, w, h, fps):
 	cv2.line(img, (x, y), (319, 239), (0, 255, 0), 2)
@@ -22,9 +22,9 @@ def draw_HUD(img, x, y, w, h, fps):
 	cv2.putText(img, "FPS: %s" % fps, (582, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0))
 
 def main():
-	h = 160
-	s = 50
-	v = 50
+	h = 9
+	s = 235
+	v = 30
 	initial_time = time.time()
 	total_frames = 0
 	times = [time.time()]
@@ -73,11 +73,13 @@ def main():
 			cv2.imshow('tyr-vision', flipped_img)
 		else :
 			print 'Nothing found. '
+			draw_HUD(flipped_img, 319, 239, 0, 0, fps)
 			cv2.imshow('tyr-vision', flipped_img)
 
 
 		key = cv2.waitKey(30) & 0xff
 		if key == 27:
+			print "Total frames: %d" %total_frames
 			break
 		elif key == ord('w'):
 			h += 1
