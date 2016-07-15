@@ -1,10 +1,9 @@
 import cv2
 import numpy as np
 import time
+import urllib2
 
-capture = cv2.VideoCapture(0)
-capture.set(3, 640)
-capture.set(4, 480)
+stream = urllib2.urlopen("http://10.0.8.200/mjpg/video.mjpg")
 
 def detect_color(img, box):
 	h = np.mean(img[box[0][1]+3:box[1][1]-3, box[0][0]+3:box[1][0]-3, 0])
@@ -13,33 +12,37 @@ def detect_color(img, box):
 	return (h,s,v)
 
 def main():
-	a = 313 #upper left coords
-	b = 147
+	bytes = ''
+	a = 317 #upper left coords
+	b = 357
 	ab = (a, b)
 	c = 327 #lower right coords
-	d = 167
+	d = 377
 	cd = (c, d)
 	while True:
-		ret, img = capture.read()
-		if not ret:
-			time.sleep(0.08)
-			continue
-		hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-		flipped_img = cv2.flip(hsv_img, 1)
-		cv2.rectangle(flipped_img, ab, cd, (0, 100, 255), 3) #it uses bgr lol
-		cv2.imshow('HSV detect', flipped_img)
-		h, s, v = detect_color(flipped_img, (ab, cd))
+		bytes += stream.read(1024)
+		a = bytes.find('\xff\xd8')
+		b = bytes.find('\xff\xd9')
 
-		print "H value: %f" % h
-		print "S value: %f" % s
-		print "V value: %f" % v
+		if a!=-1 and b!=-1:
+			jpg = bytes[a:b+2]
+			bytes= bytes[b+2:]
+			img = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8),1)
+			hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+			flipped_img = cv2.flip(hsv_img, 1)
+			cv2.rectangle(img, ab, cd, (0, 100, 255), 3) #it uses bgr lol
+			cv2.imshow('HSV detect', img)
+			h, s, v = detect_color(flipped_img, (ab, cd))
 
-		key = cv2.waitKey(30) & 0xff
-		if key == 27:
-			break
+			print "H value: %f" % h
+			print "S value: %f" % s
+			print "V value: %f" % v
 
-	capture.release()
+			key = cv2.waitKey(30) & 0xff
+			if key == 27:
+				break
+
 	cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-	main()
+		main()
