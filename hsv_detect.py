@@ -14,10 +14,10 @@ def detect_color(img, box):
 def main():
 	bytes = ''
 	a = 317 #upper left coords
-	b = 357
+	b = 257
 	ab = (a, b)
 	c = 327 #lower right coords
-	d = 377
+	d = 277
 	cd = (c, d)
 	while True:
 		bytes += stream.read(1024)

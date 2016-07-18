@@ -4,12 +4,12 @@ import time
 import urllib2
 
 stream = urllib2.urlopen("http://10.0.8.200/mjpg/video.mjpg")
-COLOR_MIN = np.array([80, 232, 230], np.uint8)
-COLOR_MAX = np.array([95, 250, 245], np.uint8)
+COLOR_MIN = np.array([55, 220, 220], np.uint8)
+COLOR_MAX = np.array([70, 254, 254], np.uint8)
 
-def draw_HUD(img, x, y, w, h, fps):
+def draw_HUD(img, x, y, w, h, fps, angle):
 	cv2.line(img, (x, y), (319, 239), (0, 255, 0), 2)
-	cv2.rectangle(img, (0, 0), (120, 48), (255, 255, 255), 2)
+	cv2.rectangle(img, (0, 0), (150, 48), (255, 255, 255), 2)
 	cv2.rectangle(img, (580, 0), (638, 40), (255, 255, 255), 2)
 	target_center_x = x
 	target_center_y = (y + y + h) / 2
@@ -18,6 +18,7 @@ def draw_HUD(img, x, y, w, h, fps):
 	text = "<%d, %d>" % (displacement_x, displacement_y)
 	cv2.putText(img, "%s" % text, (2, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
 	cv2.putText(img, "FPS: %s" % fps, (582, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0))
+	cv2.putText(img, "%s" % np.around(angle, 1), (95, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
 
 def main():
 	bytes = ' '
@@ -68,15 +69,14 @@ def main():
 				y = extTop[1]
 				w = extRight[0] - x
 				height = y - extBottom[1]
-				draw_HUD(flipped_img, x, y, w, height, fps)
-				#angle = np.atan((x - 319.5) / (282.2047))
-				#print "Skew angle: %f" % angle
-				cv2.drawContours(flipped_img, [approx], -1, (255, 255, 0), 2)
+				angle = np.rad2deg(np.arctan((x - 319.5) / 282.2047))
+				draw_HUD(flipped_img, x, y, w, height, fps, angle)
+				cv2.drawContours(flipped_img, [approx], -1, (255, 150, 0), 2)
 
 				cv2.imshow('tyr-vision', flipped_img)
 			else :
 				print 'Nothing found. '
-				draw_HUD(flipped_img, 319, 239, 0, 0, fps)
+				draw_HUD(flipped_img, 319, 239, 0, 0, fps, angle)
 				cv2.imshow('tyr-vision', flipped_img)
 
 

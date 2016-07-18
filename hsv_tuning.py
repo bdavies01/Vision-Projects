@@ -4,13 +4,13 @@ import time
 import urllib2
 
 stream = urllib2.urlopen("http://10.0.8.200/mjpg/video.mjpg")
-COLOR_MAX = np.array([100, 254, 254], np.uint8)
+COLOR_MAX = np.array([70, 254, 254], np.uint8)
 
 def main():
 	bytes = ''
-	h = 75
-	s = 190
-	v = 70
+	h = 50
+	s = 220
+	v = 230
 	while True:
 		bytes += stream.read(1024)
 		a = bytes.find('\xff\xd8')
