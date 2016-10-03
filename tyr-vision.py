@@ -12,8 +12,8 @@ NetworkTable.initialize()
 
 table = NetworkTable.getTable("visiondata")
 
-COLOR_MIN = np.array([35, 30, 30], np.uint8) #min and max hsv thresholds
-COLOR_MAX = np.array([70, 254, 254], np.uint8)
+COLOR_MIN = np.array([30, 90, 70], np.uint8) #min and max hsv thresholds
+COLOR_MAX = np.array([180, 254, 254], np.uint8)
 
 def draw_HUD(img, x, y, fps, angle):
 	cv2.line(img, (x, y), (319, 239), (0, 255, 0), 2) #line from screen center to goal edge
@@ -66,7 +66,7 @@ def main():
 				epsilon = 0.012 * cv2.arcLength(largestContour, True) 
 				approx = cv2.approxPolyDP(largestContour, epsilon, True) #approvimate polygon from contour
 
-				extLeft = tuple(approx[approx[:, :, 0].argmin()][0]) #top left coordinate
+				extLeft = tuple(approx[approx[:, :, 0].argmax()][0]) #top left coordinate
 				extTop = tuple(approx[approx[:, :, 1].argmin()][0])
 				
 				x = extLeft[0]
@@ -92,6 +92,10 @@ def main():
 			if key == 27:
 				print "Total frames: %d" %total_frames
 				break
+		else:
+			bytes += stream.read(1024) #read the bytes
+			a = bytes.find('\xff\xd8')
+			b = bytes.find('\xff\xd9')
 	cv2.destroyAllWindows()
 
 if __name__ == '__main__':

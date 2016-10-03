@@ -3,7 +3,7 @@ import numpy as np
 import time
 import urllib2
 
-stream = urllib2.urlopen("http://10.0.8.200/mjpg/video.mjpg")
+stream = urllib2.urlopen("http://10.0.8.3/mjpg/video.mjpg")
 COLOR_MAX = np.array([70, 254, 254], np.uint8)
 
 def main():
@@ -46,6 +46,10 @@ def main():
 			print "H value: %d" % h 
 			print "S value: %d" % s
 			print "V value: %d" % v
+		else:
+			bytes += stream.read(1024)
+			a = bytes.find('\xff\xd8')
+			b = bytes.find('\xff\xd9')
 	cv2.destroyAllWindows()
 
 if __name__ == "__main__":
