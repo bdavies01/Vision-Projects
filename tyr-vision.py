@@ -66,10 +66,10 @@ def main():
 				epsilon = 0.012 * cv2.arcLength(largestContour, True) 
 				approx = cv2.approxPolyDP(largestContour, epsilon, True) #approvimate polygon from contour
 
-				extLeft = tuple(approx[approx[:, :, 0].argmax()][0]) #top left coordinate
+				extRight = tuple(approx[approx[:, :, 0].argmax()][0]) #top left coordinate
 				extTop = tuple(approx[approx[:, :, 1].argmin()][0])
 				
-				x = extLeft[0]
+				x = extRight[0]
 				y = extTop[1]
 				angle = np.rad2deg(np.arctan((x - 319.5) / 282.2047))
 				draw_HUD(flipped_img, x, y, fps, angle) #draw the hud on the flipped image
