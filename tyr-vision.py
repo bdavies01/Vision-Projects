@@ -4,7 +4,7 @@ import time
 import urllib2
 from networktables import NetworkTable
 
-stream = urllib2.urlopen("http://10.0.8.200/mjpg/video.mjpg")
+stream = urllib2.urlopen("http://10.0.8.3/mjpg/video.mjpg")
 IP = "roborio-8-frc.local"
 NetworkTable.setIPAddress(IP)
 NetworkTable.setClientMode()
@@ -12,8 +12,11 @@ NetworkTable.initialize()
 
 table = NetworkTable.getTable("visiondata")
 
-COLOR_MIN = np.array([35, 30, 30], np.uint8) #min and max hsv thresholds
-COLOR_MAX = np.array([70, 254, 254], np.uint8)
+COLOR_MIN = np.array([40, 75, 80], np.uint8) #min and max hsv thresholds
+COLOR_MAX = np.array([180, 254, 254], np.uint8)
+
+# Used to tell if the set point is unique
+
 
 def draw_HUD(img, x, y, fps, angle):
 	cv2.line(img, (x, y), (319, 239), (0, 255, 0), 2) #line from screen center to goal edge
@@ -36,7 +39,7 @@ def main():
 		bytes += stream.read(1024) #read the bytes
 		a = bytes.find('\xff\xd8')
 		b = bytes.find('\xff\xd9')
-
+		print table.getNumber("status",0)
 		if a!=-1 and b!=-1:
 			jpg = bytes[a:b+2]
 			bytes= bytes[b+2:]
@@ -66,10 +69,10 @@ def main():
 				epsilon = 0.012 * cv2.arcLength(largestContour, True) 
 				approx = cv2.approxPolyDP(largestContour, epsilon, True) #approvimate polygon from contour
 
-				extLeft = tuple(approx[approx[:, :, 0].argmin()][0]) #top left coordinate
+				extRight = tuple(approx[approx[:, :, 0].argmax()][0]) #top left coordinate
 				extTop = tuple(approx[approx[:, :, 1].argmin()][0])
 				
-				x = extLeft[0]
+				x = extRight[0]
 				y = extTop[1]
 				angle = np.rad2deg(np.arctan((x - 319.5) / 282.2047))
 				draw_HUD(flipped_img, x, y, fps, angle) #draw the hud on the flipped image
@@ -86,12 +89,15 @@ def main():
 				table.putNumber("xdisplacement", 100000)
 				draw_HUD(flipped_img, 319, 239, fps, angle) #draw a hud with no contour detected 
 				cv2.imshow('tyr-vision', flipped_img)
-
-
 			key = cv2.waitKey(30) & 0xff #press ESC to quit
 			if key == 27:
 				print "Total frames: %d" %total_frames
 				break
+
+		else:
+			bytes += stream.read(1024) #read the bytes
+			a = bytes.find('\xff\xd8')
+			b = bytes.find('\xff\xd9')
 	cv2.destroyAllWindows()
 
 if __name__ == '__main__':
