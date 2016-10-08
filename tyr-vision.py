@@ -12,8 +12,8 @@ NetworkTable.initialize()
 
 table = NetworkTable.getTable("visiondata")
 
-COLOR_MIN = np.array([30, 90, 70], np.uint8) #min and max hsv thresholds
-COLOR_MAX = np.array([180, 254, 254], np.uint8)
+COLOR_MIN = np.array([40, 75, 130], np.uint8) #min and max hsv thresholds
+COLOR_MAX = np.array([65, 254, 254], np.uint8)
 
 def draw_HUD(img, x, y, fps, angle):
 	cv2.line(img, (x, y), (319, 239), (0, 255, 0), 2) #line from screen center to goal edge
@@ -48,7 +48,7 @@ def main():
 				times.pop(0)
 			fps = (int)(1.0 / (times[-1] - times[-2]))
 
-			flipped_img = cv2.flip(img, 1)
+			flipped_img = img
 			hsv_img = cv2.cvtColor(flipped_img, cv2.COLOR_BGR2HSV) #convert image to HSV
 			threshold = cv2.inRange(hsv_img, COLOR_MIN, COLOR_MAX) #hsv threshold 
 
@@ -85,6 +85,7 @@ def main():
 				table.putNumber("skewangle", 100000) #values at 100,000 if nothing found
 				table.putNumber("xdisplacement", 100000)
 				draw_HUD(flipped_img, 319, 239, fps, angle) #draw a hud with no contour detected 
+				cv2.namedWindow('tyr-vision', cv2.WINDOW_NORMAL)
 				cv2.imshow('tyr-vision', flipped_img)
 
 
