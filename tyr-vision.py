@@ -17,14 +17,10 @@ COLOR_MAX = np.array([65, 254, 254], np.uint8)
 
 def draw_HUD(img, x, y, fps, angle):
 	cv2.line(img, (x, y), (319, 239), (0, 255, 0), 2) #line from screen center to goal edge
-	cv2.rectangle(img, (0, 0), (160, 48), (255, 255, 255), 2)
-	cv2.rectangle(img, (580, 0), (638, 40), (255, 255, 255), 2)
 	displacement_x = 319 - x
 	displacement_y = 239 - y
 	text = "<%d, %d>" % (displacement_x, displacement_y)
-	cv2.putText(img, "%s" % text, (2, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0)) #x and y displacement
-	cv2.putText(img, "FPS: %s" % fps, (582, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0)) #FPS meter
-	cv2.putText(img, " %s" % np.around(angle, 1), (95, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0)) #angle
+	cv2.putText(img, "%s" % text, (2, 35), cv2.FONT_HERSHEY_TRIPLEX, 1.2, (0, 255, 0)) #x and y displacement
 
 def main():
 	bytes = ' ' #bytestream from the camera
@@ -66,7 +62,7 @@ def main():
 				epsilon = 0.012 * cv2.arcLength(largestContour, True) 
 				approx = cv2.approxPolyDP(largestContour, epsilon, True) #approvimate polygon from contour
 
-				extRight = tuple(approx[approx[:, :, 0].argmax()][0]) #top left coordinate
+				extRight = tuple(approx[approx[:, :, 0].argmax()][0]) #top right coordinate
 				extTop = tuple(approx[approx[:, :, 1].argmin()][0])
 				
 				x = extRight[0]
@@ -76,8 +72,9 @@ def main():
 				cv2.drawContours(flipped_img, [approx], -1, (255, 150, 0), 2) #draw the contours on the flipped image
 
 				table.putNumber("skewangle", angle)
-				table.putNumber("xdisplacement", (319 - x))
+				table.putNumber("xdisplacement", (319.5 - x))
 
+				cv2.namedWindow('tyr-vision', cv2.WINDOW_NORMAL)
 				cv2.imshow('tyr-vision', flipped_img) #create a window with the complete image
 			else :
 				angle = 0
